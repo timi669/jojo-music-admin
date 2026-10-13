@@ -141,6 +141,36 @@ export const updateArtistAvatar = (id: number, data: object) => {
   });
 };
 
+export type ArtistProfileEnrichmentStatus = {
+  jobId: string;
+  state: "running" | "completed" | "failed";
+  total: number;
+  processed: number;
+  avatarsAdded: number;
+  introductionsAdded: number;
+  skipped: number;
+  failed: number;
+  currentArtist?: string;
+  issues: string[];
+  omittedIssues: number;
+};
+
+/** 歌手管理-启动缺失头像和简介补全 */
+export const startArtistProfileEnrichment = () => {
+  const userData = getToken();
+  return http.request<Result>("post", "/admin/enrichMissingArtistProfiles", {
+    headers: { Authorization: userData.accessToken }
+  });
+};
+
+/** 歌手管理-查询头像和简介补全进度 */
+export const getArtistProfileEnrichmentStatus = () => {
+  const userData = getToken();
+  return http.request<Result>("get", "/admin/artistProfileEnrichmentStatus", {
+    headers: { Authorization: userData.accessToken }
+  });
+};
+
 /** 歌手管理-删除歌手 */
 export const deleteArtist = (id: number) => {
   const userData = getToken();

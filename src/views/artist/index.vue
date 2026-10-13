@@ -1,8 +1,14 @@
 <script setup lang="ts">
 import { ref } from "vue";
+import { ElMessageBox } from "element-plus";
 import { useArtist } from "./utils/hook";
 import { PureTableBar } from "@/components/RePureTableBar";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
+import {
+  getArtistProfileEnrichmentStatus,
+  startArtistProfileEnrichment,
+  type ArtistProfileEnrichmentStatus
+} from "@/api/system";
 
 import Upload from "@iconify-icons/ri/upload-line";
 import More from "@iconify-icons/ep/more-filled";
@@ -17,6 +23,8 @@ defineOptions({
 
 const formRef = ref();
 const tableRef = ref();
+const enrichingProfiles = ref(false);
+const enrichmentStatus = ref<ArtistProfileEnrichmentStatus | null>(null);
 
 const {
   form,
@@ -39,6 +47,80 @@ const {
   handleCurrentChange,
   handleSelectionChange
 } = useArtist(tableRef);
+
+const waitForStatus = (milliseconds: number) =>
+  new Promise(resolve => setTimeout(resolve, milliseconds));
+
+async function handleEnrichProfiles() {
+  try {
+    await ElMessageBox.confirm(
+      "将只补充头像或简介为空的歌手。系统仅采用 MusicBrainz 唯一精确匹配，并从 Wikimedia 获取可用资料；无法确认的条目会跳过，不会覆盖已有资料。",
+      "自动补全歌手资料",
+      { confirmButtonText: "开始补全", cancelButtonText: "取消", type: "info" }
+    );
+  } catch (error) {
+    if (error !== "cancel" && error !== "close") {
+      console.error("确认歌手资料补全失败：", error);
+      message("无法启动歌手资料补全", { type: "error" });
+    }
+    return;
+  }
+
+  enrichingProfiles.value = true;
+  try {
+    const started = await startArtistProfileEnrichment();
+    if (started.code !== 0 || !started.data) {
+      throw new Error(started.message || "无法启动歌手资料补全");
+    }
+    enrichmentStatus.value = started.data as ArtistProfileEnrichmentStatus;
+
+    while (enrichmentStatus.value.state === "running") {
+      await waitForStatus(1500);
+      const response = await getArtistProfileEnrichmentStatus();
+      if (response.code !== 0 || !response.data) {
+        throw new Error(response.message || "无法获取歌手资料补全进度");
+      }
+      enrichmentStatus.value = response.data as ArtistProfileEnrichmentStatus;
+    }
+
+    await onSearch();
+    const status = enrichmentStatus.value;
+    if (!status) {
+      throw new Error("歌手资料补全任务没有返回状态");
+    }
+    const summary =
+      `处理 ${status.processed}/${status.total} 位歌手；` +
+      `新增头像 ${status.avatarsAdded} 张，简介 ${status.introductionsAdded} 条；` +
+      `跳过 ${status.skipped} 位，失败 ${status.failed} 位。`;
+    message(summary, {
+      type:
+        status.state === "failed" || status.failed > 0 ? "warning" : "success"
+    });
+    if (status.issues.length > 0 || status.omittedIssues > 0) {
+      const issueText = [
+        ...status.issues,
+        ...(status.omittedIssues > 0
+          ? [`另有 ${status.omittedIssues} 条未显示，请重试或检查服务日志。`]
+          : [])
+      ].join("\n");
+      await ElMessageBox.alert(issueText, "未自动补全的歌手", {
+        confirmButtonText: "知道了",
+        type:
+          status.state === "failed" || status.failed > 0 ? "warning" : "info"
+      });
+    }
+  } catch (error) {
+    console.error("自动补全歌手资料失败：", error);
+    message(
+      error instanceof Error
+        ? error.message
+        : "自动补全歌手资料失败，请稍后重试",
+      { type: "error" }
+    );
+  } finally {
+    enrichingProfiles.value = false;
+  }
+}
 </script>
 
 <template>
@@ -97,6 +179,18 @@ const {
 
       <PureTableBar title="歌手管理" :columns="columns" @refresh="onSearch">
         <template #buttons>
+          <el-button
+            type="success"
+            :loading="enrichingProfiles"
+            :disabled="enrichingProfiles"
+            @click="handleEnrichProfiles"
+          >
+            {{
+              enrichingProfiles && enrichmentStatus
+                ? `补全中 ${enrichmentStatus.processed}/${enrichmentStatus.total}`
+                : "自动补全缺失资料"
+            }}
+          </el-button>
           <el-button
             type="primary"
             :icon="useRenderIcon(AddFill)"
