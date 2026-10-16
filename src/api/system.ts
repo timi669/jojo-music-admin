@@ -7,6 +7,14 @@ export type Result = {
   data?: Array<any> | number | string | object;
 };
 
+export type SongAudioValidationResult = {
+  detectedFormat: string;
+  codec: string;
+  durationSeconds: number;
+  contentType: string;
+  warning: string | null;
+};
+
 export type ResultTable = {
   code: number;
   message: string;
@@ -262,14 +270,18 @@ export const updateSongCover = (id: number, data: object) => {
 /** 歌曲管理-更新歌曲音频 */
 export const updateSongAudio = (id: number, data: FormData) => {
   const userData = getToken();
-  return http.request<Result>("patch", `/admin/updateSongAudio/${id}`, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-      Authorization: userData.accessToken
-    },
-    data,
-    responseType: "json" // 确保使用正确的响应类型（可以使用 'json' 或 'blob'）
-  });
+  return http.request<Result & { data?: SongAudioValidationResult }>(
+    "patch",
+    `/admin/updateSongAudio/${id}`,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: userData.accessToken
+      },
+      data,
+      responseType: "json" // 确保使用正确的响应类型（可以使用 'json' 或 'blob'）
+    }
+  );
 };
 
 /** 歌曲管理-删除歌曲 */
