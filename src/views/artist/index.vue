@@ -54,7 +54,7 @@ const waitForStatus = (milliseconds: number) =>
 async function handleEnrichProfiles() {
   try {
     await ElMessageBox.confirm(
-      "将只补充头像或简介为空的歌手。系统仅采用 MusicBrainz 唯一精确匹配，并从 Wikimedia 获取可用资料；无法确认的条目会跳过，不会覆盖已有资料。",
+      "系统会扫描歌曲引用的 MinIO MP3/FLAC 音频标签，按规范化姓名去重后只新建歌手库中不存在的艺人；随后通过 MusicBrainz 唯一精确匹配，并优先从中文维基/Wikidata补充简介、头像、性别和国籍。已有头像会保留，无法可靠匹配的条目会跳过并列出原因。",
       "自动补全歌手资料",
       { confirmButtonText: "开始补全", cancelButtonText: "取消", type: "info" }
     );
@@ -89,8 +89,9 @@ async function handleEnrichProfiles() {
       throw new Error("歌手资料补全任务没有返回状态");
     }
     const summary =
+      `扫描 ${status.audioFilesScanned} 个音频文件，识别 ${status.uniqueArtistsFound} 个艺人名，新建 ${status.artistsAdded} 位、关联歌曲 ${status.songLinksAdded} 条；` +
       `处理 ${status.processed}/${status.total} 位歌手；` +
-      `新增头像 ${status.avatarsAdded} 张，简介 ${status.introductionsAdded} 条；` +
+      `更新头像 ${status.avatarsAdded} 张、简介 ${status.introductionsAdded} 条、性别 ${status.gendersAdded} 条、国籍 ${status.areasAdded} 条；` +
       `跳过 ${status.skipped} 位，失败 ${status.failed} 位。`;
     message(summary, {
       type:
@@ -187,7 +188,9 @@ async function handleEnrichProfiles() {
           >
             {{
               enrichingProfiles && enrichmentStatus
-                ? `补全中 ${enrichmentStatus.processed}/${enrichmentStatus.total}`
+                ? enrichmentStatus.audioSongsProcessed < enrichmentStatus.audioSongsTotal
+                  ? `扫描音频 ${enrichmentStatus.audioSongsProcessed}/${enrichmentStatus.audioSongsTotal}`
+                  : `补全中 ${enrichmentStatus.processed}/${enrichmentStatus.total}`
                 : "自动补全缺失资料"
             }}
           </el-button>

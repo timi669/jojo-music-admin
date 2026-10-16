@@ -146,8 +146,16 @@ export type ArtistProfileEnrichmentStatus = {
   state: "running" | "completed" | "failed";
   total: number;
   processed: number;
+  audioSongsTotal: number;
+  audioSongsProcessed: number;
+  audioFilesScanned: number;
+  uniqueArtistsFound: number;
+  artistsAdded: number;
+  songLinksAdded: number;
   avatarsAdded: number;
   introductionsAdded: number;
+  gendersAdded: number;
+  areasAdded: number;
   skipped: number;
   failed: number;
   currentArtist?: string;
