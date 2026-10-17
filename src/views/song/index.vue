@@ -6,6 +6,7 @@ import { PureTableBar } from "@/components/RePureTableBar";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 import PreviewDialog from "./form/preview.vue";
 import UploadAudioDialog from "./form/upload.vue";
+import LyricImportDialog from "./form/lyric-import.vue";
 
 import Upload from "@iconify-icons/ri/upload-line";
 import Preview from "@iconify-icons/ri/headphone-line";
@@ -23,6 +24,7 @@ const treeRef = ref();
 const formRef = ref();
 const tableRef = ref();
 const showUploadDialog = ref(false);
+const showLyricImportDialog = ref(false);
 const selectedSongId = ref(null);
 const showPreviewDialog = ref(false);
 const selectedSongName = ref(null);
@@ -119,6 +121,12 @@ const openPreviewDialog = row => {
         @refresh="onSearch"
       >
         <template #buttons>
+          <el-button
+            :icon="useRenderIcon('ri:file-music-line')"
+            @click="showLyricImportDialog = true"
+          >
+            批量导入歌词
+          </el-button>
           <el-button
             type="primary"
             :icon="useRenderIcon(AddFill)"
@@ -266,6 +274,12 @@ const openPreviewDialog = row => {
             :songName="selectedSongName"
             :audioUrl="selectedAudioUrl"
             @update:visible="showPreviewDialog = $event"
+          />
+          <LyricImportDialog
+            v-if="showLyricImportDialog"
+            :visible="showLyricImportDialog"
+            @update:visible="showLyricImportDialog = $event"
+            @success="onSearch"
           />
         </template>
       </PureTableBar>

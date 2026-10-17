@@ -15,6 +15,34 @@ export type SongAudioValidationResult = {
   warning: string | null;
 };
 
+export type LyricSongCandidate = {
+  songId: number;
+  songName: string;
+  artistName: string;
+  artistCredits: string;
+  lyricUrl: string | null;
+  hasLyric: boolean;
+};
+
+export type LyricImportPreviewItem = {
+  fileIndex: number;
+  filename: string;
+  size: number;
+  timestampCount: number;
+  normalizedTitle: string;
+  normalizedArtist: string;
+  matchStatus: string;
+  suggestedSongId: number | null;
+  existingLyric: boolean;
+  candidates: LyricSongCandidate[];
+};
+
+type LyricImportResponse<T> = {
+  code: number;
+  message: string;
+  data: T;
+};
+
 export type ResultTable = {
   code: number;
   message: string;
@@ -280,6 +308,54 @@ export const updateSongAudio = (id: number, data: FormData) => {
       },
       data,
       responseType: "json" // 确保使用正确的响应类型（可以使用 'json' 或 'blob'）
+    }
+  );
+};
+
+/** 歌曲管理-预览 LRC 文件匹配结果 */
+export const previewLyricImport = (data: FormData) => {
+  const userData = getToken();
+  return http.request<LyricImportResponse<LyricImportPreviewItem[]>>(
+    "post",
+    "/admin/lyrics/preview",
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: userData.accessToken
+      },
+      data,
+      responseType: "json"
+    }
+  );
+};
+
+/** 歌曲管理-人工搜索歌词目标歌曲 */
+export const searchLyricImportSongs = (keyword: string) => {
+  const userData = getToken();
+  return http.request<LyricImportResponse<LyricSongCandidate[]>>(
+    "get",
+    `/admin/lyrics/songs?keyword=${encodeURIComponent(keyword)}`,
+    {
+      headers: {
+        Authorization: userData.accessToken
+      }
+    }
+  );
+};
+
+/** 歌曲管理-确认后导入 LRC 文件 */
+export const importLyrics = (data: FormData) => {
+  const userData = getToken();
+  return http.request<LyricImportResponse<number>>(
+    "post",
+    "/admin/lyrics/import",
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: userData.accessToken
+      },
+      data,
+      responseType: "json"
     }
   );
 };
