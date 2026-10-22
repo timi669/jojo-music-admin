@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
+import { message } from "@/utils/message";
 import { ElMessageBox } from "element-plus";
 import { useArtist } from "./utils/hook";
 import { PureTableBar } from "@/components/RePureTableBar";

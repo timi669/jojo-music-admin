@@ -2,6 +2,7 @@ import "./reset.css";
 import dayjs from "dayjs";
 import editForm from "../form/index.vue";
 import { message } from "@/utils/message";
+import userAvatar from "@/assets/user.jpg";
 import { usePublicHooks } from "@/hooks/usePublicHooks";
 import { addDialog } from "@/components/ReDialog";
 import type { PaginationProps } from "@pureadmin/table";
@@ -18,6 +19,7 @@ import {
 import { ElMessageBox } from "element-plus";
 import {
   type Ref,
+  h,
   ref,
   toRaw,
   computed,
