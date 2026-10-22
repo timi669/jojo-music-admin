@@ -138,7 +138,7 @@ const {
           </div>
           <pure-table
             ref="tableRef"
-            row-key="userId"
+            row-key="playlistId"
             adaptive
             :adaptiveConfig="{ offsetBottom: 108 }"
             align-whole="center"
