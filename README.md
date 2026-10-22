@@ -18,6 +18,10 @@
 - 反馈管理：查看用户反馈与处理记录
 - 轮播图管理：维护首页展示内容
 
+> 本项目基于 **vue-pure-admin（pure-admin-thin）** 模板二次开发。
+> 仓库中仍保留若干模板自带但本项目未启用的能力（mock、i18n、部分指令与组件），
+> 阅读代码时请注意区分「自研业务」与「模板层」。
+
 ## 技术栈
 
 - Vue 3
@@ -86,9 +90,17 @@
 - `pnpm dev`：启动开发服务器
 - `pnpm build`：构建生产包
 - `pnpm preview`：本地预览生产构建
-- `pnpm lint`：代码检查
-- `pnpm format`：格式化代码
-- `pnpm type-check`：TypeScript 类型检查
+- `pnpm typecheck`：TypeScript 类型检查
+- `pnpm lint`：代码检查（含 eslint / prettier / stylelint）
+- `pnpm lint:eslint`：仅执行 ESLint（带 `--fix`）
+- `pnpm lint:prettier`：仅执行 Prettier 格式化
+- `pnpm lint:stylelint`：仅执行 Stylelint
+
+## 测试与持续集成
+
+- CI：`.github/workflows/ci.yml` 在 push / PR 到 `main` 时执行
+  类型检查 → 生产构建
+- 本仓库当前未配置单元测试，门禁以类型检查与构建为主
 
 ## 项目截图
 
