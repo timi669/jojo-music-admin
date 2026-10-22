@@ -323,7 +323,11 @@ export function useSong(tableRef: Ref, treeRef: Ref) {
             console.log("curData", curData);
             // 表单规则校验通过
             if (title === "新增") {
-              curData.style = Array.isArray(curData.style)
+              // 后端 SongAddDTO.style 为 String（多风格以逗号分隔），
+              // 表单里是数组，故提交前 join 成字符串。
+              // 此处用 unknown 中转，避免修改 FormItemProps.style 的既有声明
+              // 影响表单组件的 v-model 类型。
+              (curData as unknown as { style: string }).style = Array.isArray(curData.style)
                 ? curData.style.join(",")
                 : "";
               addSong(curData).then(res => {
@@ -334,7 +338,8 @@ export function useSong(tableRef: Ref, treeRef: Ref) {
                 }
               });
             } else {
-              curData.style = Array.isArray(curData.style)
+              // 同"新增"分支：提交前把数组形式的多风格 join 成后端所需字符串
+              (curData as unknown as { style: string }).style = Array.isArray(curData.style)
                 ? curData.style.join(",")
                 : "";
               updateSong(curData).then(res => {

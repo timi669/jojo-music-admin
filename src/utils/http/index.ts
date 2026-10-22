@@ -85,22 +85,11 @@ class PureHttp {
                 const now = new Date().getTime();
                 const expired = parseInt(data.expires) - now <= 0;
                 if (expired) {
-                  if (!PureHttp.isRefreshing) {
-                    PureHttp.isRefreshing = true;
-                    // token过期刷新
-                    useUserStoreHook()
-                      .handRefreshToken({ refreshToken: data.refreshToken })
-                      .then(res => {
-                        const token = res.data.accessToken;
-                        config.headers["Authorization"] = formatToken(token);
-                        PureHttp.requests.forEach(cb => cb(token));
-                        PureHttp.requests = [];
-                      })
-                      .finally(() => {
-                        PureHttp.isRefreshing = false;
-                      });
-                  }
-                  resolve(PureHttp.retryOriginalRequest(config));
+                  // 本项目后端为固定 6 小时有效期的 JWT，未实现 refresh token 接口
+                  // （store 中的 handRefreshToken 已被注释、后端亦无对应端点）。
+                  // 因此 token 过期后无法静默续期，直接登出并跳转登录页，避免请求死循环。
+                  useUserStoreHook().logOut();
+                  resolve(config);
                 } else {
                   config.headers["Authorization"] = formatToken(
                     data.accessToken
