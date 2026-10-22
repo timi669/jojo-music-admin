@@ -1,7 +1,7 @@
 import "./reset.css";
 import { message } from "@/utils/message";
 import bannerCover from "@/assets/cover.png";
-import { usePublicHooks } from "../hooks";
+import { usePublicHooks } from "@/hooks/usePublicHooks";
 import { addDialog } from "@/components/ReDialog";
 import type { PaginationProps } from "@pureadmin/table";
 import ReCropper from "@/components/ReCropper";
