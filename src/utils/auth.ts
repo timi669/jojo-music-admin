@@ -117,7 +117,7 @@ export function getToken(): DataInfo<number> {
 
 export function setToken(data: DataInfo<Date>) {
   let expires = 0;
-  const { accessToken, refreshToken, roles, username } = data;
+  const { accessToken, refreshToken, roles, username, permissions } = data;
   const { isRemembered, loginDay } = useUserStoreHook();
   expires = new Date(data.expires).getTime();
 
@@ -139,30 +139,49 @@ export function setToken(data: DataInfo<Date>) {
       : {}
   );
 
-  function setUserKey({ username, roles }) {
+  function setUserKey({ username, roles, permissions }) {
     useUserStoreHook().SET_USERNAME(username);
     useUserStoreHook().SET_ROLES(roles);
+    /*
+     * 按钮级权限必须一并落库到 store。
+     *
+     * 原实现只存了 username / roles，从未调用 SET_PERMS ——
+     * 于是 `hasPerms` 永远拿到空数组，`v-perms` / `<Perms>` 一律失效
+     * （要么整块隐藏、要么以为有权限而误显示）。
+     *
+     * 说明：当前后端（jojo-music-server）只有 ROLE_ADMIN 角色、
+     * 未返回 permissions 字段，因此这里兼容两种情况：
+     * 后端给了就用后端的；没给则回退为通配 "*:*:*"，
+     * 表示"该角色拥有全部按钮权限"，与本项目实际只有管理员一种角色的
+     * 现状一致，避免 v-perms 误判为无权限。
+     */
+    const perms = Array.isArray(permissions) && permissions.length
+      ? permissions
+      : ["*:*:*"];
+    useUserStoreHook().SET_PERMS(perms);
     storageLocal().setItem(userKey, {
       refreshToken,
       expires,
       username,
-      roles
+      roles,
+      permissions: perms
     });
   }
 
   if (username && roles) {
     setUserKey({
       username,
-      roles
+      roles,
+      permissions
     });
   } else {
-    const username =
-      storageLocal().getItem<DataInfo<number>>(userKey)?.username ?? "";
-    const roles =
-      storageLocal().getItem<DataInfo<number>>(userKey)?.roles ?? [];
+    const cached = storageLocal().getItem<DataInfo<number>>(userKey);
+    const username = cached?.username ?? "";
+    const roles = cached?.roles ?? [];
     setUserKey({
       username,
-      roles
+      roles,
+      permissions: cached?.permissions
     });
   }
 }
