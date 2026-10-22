@@ -229,7 +229,7 @@ async function handleEnrichProfiles() {
           </div>
           <pure-table
             ref="tableRef"
-            row-key="userId"
+            row-key="artistId"
             adaptive
             :adaptiveConfig="{ offsetBottom: 108 }"
             align-whole="center"

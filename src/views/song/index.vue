@@ -162,7 +162,7 @@ const openPreviewDialog = row => {
           </div>
           <pure-table
             ref="tableRef"
-            row-key="id"
+            row-key="songId"
             adaptive
             :adaptiveConfig="{ offsetBottom: 108 }"
             align-whole="center"
