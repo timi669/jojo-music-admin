@@ -121,7 +121,13 @@ export function useNav() {
     return remainingPaths.includes(path);
   }
 
-  /** 获取`logo` */
+  /**
+   * 获取`logo`
+   *
+   * 侧边栏图标位是 32px 方形（见 SidebarLogo.vue），因此用品牌方形标记
+   * （金环嵌星）而非横排字标 —— 横排字标宽高比 4.72，32px 高会宽出约 151px，
+   * 会把同排的侧边栏标题挤掉。
+   */
   function getLogo() {
     return new URL("/logo.svg", import.meta.url).href;
   }
