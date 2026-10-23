@@ -33,9 +33,16 @@ const { dataTheme, overallStyle, dataThemeChange } = useDataThemeChange();
 dataThemeChange(overallStyle.value);
 const { title } = useNav();
 
+/*
+ * 登录表单初值刻意留空。
+ *
+ * 原实现预填了真实的默认管理员账号与密码（admin_1 / 123456abc），
+ * 相当于把凭据写死在源码里：任何能打开登录页的人都能直接进入后台，
+ * 且该密码会随仓库一起发布。作为管理端，这里不应提供任何默认凭据。
+ */
 const ruleForm = reactive({
-  username: "admin_1",
-  password: "123456abc"
+  username: "",
+  password: ""
 });
 
 const onLogin = async (formEl: FormInstance | undefined) => {
