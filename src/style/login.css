@@ -38,9 +38,20 @@
   width: 360px;
 }
 
+/*
+ * 登录页品牌标识。
+ *
+ * 原值是 350x80 的宽扁框，配合旧的宽幅 avatar.svg 使用。
+ * 现在换成方形品牌标记（金环嵌星，150x150），若仍用 350x80，
+ * <img> 会等比缩到 80x80 并在左右各留 135px 空白，logo 显得过小。
+ * 改成正方形并居中，让标记占满且保持等比不变形。
+ */
 .avatar {
-  width: 350px;
+  width: 80px;
   height: 80px;
+  margin: 0 auto;
+  display: block;
+  object-fit: contain;
 }
 
 .login-form h2 {
@@ -71,8 +82,9 @@
     width: 360px;
   }
 
+  /* 与上面的 .avatar 同步为正方形，避免窄屏下又把方形标记挤成扁框。 */
   .avatar {
-    width: 280px;
+    width: 80px;
     height: 80px;
   }
 }
