@@ -1,3 +1,14 @@
+packages:
+  - '.'
+
+# NOTE for pnpm 9 (the version CI pins): `allowBuilds` was introduced in
+# pnpm 11 and does not exist in pnpm 9, where the equivalents are
+# onlyBuiltDependencies / neverBuiltDependencies. Because this file exists,
+# pnpm 9 treats the project as a workspace and *requires* the `packages`
+# field -- without it, install aborts with
+#   ERROR packages field missing or empty
+# which failed every CI run. The `packages` field is added above so pnpm 9
+# can resolve the workspace; the entries below are kept for pnpm 11+ users.
 allowBuilds:
   '@parcel/watcher': false
   esbuild: true
