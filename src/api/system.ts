@@ -43,6 +43,27 @@ type LyricImportResponse<T> = {
   data: T;
 };
 
+/**
+ * 从线上源抓取歌词的单首结果。
+ *
+ * 注意：后端在预览响应里刻意去掉了整份歌词正文（`lrc`），只返回统计信息，
+ * 因此这里没有歌词内容字段。
+ */
+export type LyricFetchResult = {
+  songId: number;
+  songName: string;
+  artistName: string;
+  /** 是否找到可用歌词 */
+  found: boolean;
+  /** 实际匹配到的歌名/歌手，便于人工核对 */
+  matchedTitle: string | null;
+  matchedArtist: string | null;
+  /** 歌词字符数 */
+  lyricLength: number;
+  /** 未命中的原因 */
+  reason: string;
+};
+
 export type ResultTable = {
   code: number;
   message: string;
@@ -366,6 +387,40 @@ export const deleteSong = (id: number) => {
   return http.request<Result>("delete", `/admin/deleteSong/${id}`, {
     headers: { Authorization: userData.accessToken }
   });
+};
+
+/** 歌曲管理-预览从网易云抓取歌词的结果（只查不写） */
+export const previewLyricFetch = (data: { songIds?: number[]; limit?: number }) => {
+  const userData = getToken();
+  return http.request<LyricImportResponse<LyricFetchResult[]>>(
+    "post",
+    "/admin/lyrics/fetchPreview",
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: userData.accessToken
+      },
+      data,
+      responseType: "json"
+    }
+  );
+};
+
+/** 歌曲管理-确认后抓取歌词并写入库中（已有歌词的歌曲不会被覆盖） */
+export const fetchLyrics = (data: { songIds?: number[]; limit?: number }) => {
+  const userData = getToken();
+  return http.request<LyricImportResponse<number>>(
+    "post",
+    "/admin/lyrics/fetch",
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: userData.accessToken
+      },
+      data,
+      responseType: "json"
+    }
+  );
 };
 
 /** 歌曲管理-批量删除歌曲 */
