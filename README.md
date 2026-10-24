@@ -104,14 +104,15 @@
 
 ## 项目截图
 
-![登录界面](./img/admin_login.png)
-![系统首页界面](./img/admin_home.png)
-![用户管理界面](./img/admin_user_management.png)
-![歌手管理界面](./img/admin_artist_management.png)
-![歌曲管理界面](./img/admin_song_management.png)
-![歌单管理界面](./img/admin_playlist_management.png)
-![反馈管理界面](./img/admin_feedback_management.png)
-![轮播图管理界面](./img/admin_banner_management.png)
+![登录界面](./img/jojoadmin_login.png)
+![系统首页界面](./img/jojoadmin_home.png)
+![用户管理界面](./img/jojoadmin_user_management.png)
+![歌手管理界面](./img/jojoadmin_artist_management.png)
+![歌曲管理界面](./img/jojoadmin_song_management.png)
+![歌曲上传界面](./img/jojoadmin_upload_img.png)
+![歌单管理界面](./img/jojoadmin_playlist_management.png)
+![反馈管理界面](./img/jojoadmin_feedback_management.png)
+![轮播图管理界面](./img/jojoadmin_banner_management.png)
 
 ## 依赖后端服务
 
