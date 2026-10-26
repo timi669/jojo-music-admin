@@ -9,6 +9,7 @@
     "name": "timi669",
     "email": "19491001zxgw@gmail.com"
   },
+  "license": "MIT",
   "scripts": {
     "dev": "NODE_OPTIONS=--max-old-space-size=4096 vite",
     "serve": "pnpm dev",
